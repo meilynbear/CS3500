@@ -7,8 +7,8 @@
 namespace CS3500.FormulaTests;
 
 // using CS3500.Formula1; // Change this using statement to use different formula implementations.
-// using CS3500.Formula2;
- using CS3500.Formula3;
+ using CS3500.Formula2;
+// using CS3500.Formula3;
 
 /// <summary>
 ///   <para>
@@ -68,10 +68,10 @@ public class FormulaSyntaxTests
     ///   </example>
     /// </summary>
     [TestMethod]
-    [ExpectedException( typeof( FormulaFormatException ) )]
-    public void FormulaConstructor_TestNoTokens_Invalid( )
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestNoTokens_Invalid()
     {
-        _ = new Formula( " " );  // note: it is arguable that you should replace "" with string.Empty for readability and clarity of intent (e.g., not a cut and paste error or a "I forgot to put something there" error).
+        _ = new Formula(" ");  // note: it is arguable that you should replace "" with string.Empty for readability and clarity of intent (e.g., not a cut and paste error or a "I forgot to put something there" error).
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public class FormulaSyntaxTests
     ///   </remarks>
     /// </summary>
     [TestMethod]
-    public void FormulaConstructor_TestHasTokenNumber()
+    public void FormulaConstructor_TestHasTokenNumber_Valid()
     {
         _ = new Formula("1");
     }
@@ -109,7 +109,7 @@ public class FormulaSyntaxTests
     ///   </remarks>
     /// </summary>
     [TestMethod]
-    public void FormulaConstructor_TestValidTokenRule()
+    public void FormulaConstructor_TestValidTokenRule_Valid()
     {
         _ = new Formula("1-1");
     }
@@ -120,7 +120,7 @@ public class FormulaSyntaxTests
     /// </summary>
     [TestMethod]
     [ExpectedException(typeof(FormulaFormatException))]
-    public void FormulaConstructor_TestValidTokenRule_RandomInvalidToken()
+    public void FormulaConstructor_TestValidTokenRuleSquiggle_Invalid()
     {
         _ = new Formula("~");
     }
@@ -136,6 +136,57 @@ public class FormulaSyntaxTests
         _ = new Formula("a");
     }
 
+    /// <summary>
+    ///     This is an example of a test that is should throw an exception because there
+    ///     is an invalid token in the formula.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestValidTokenRule_AllValidTokens()
+    {
+        _ = new Formula("1+2*3/4-5*(23*2)");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should not throw an exception because there
+    ///     is a valid number token.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestValidTokenRuleExponent_Valid()
+    {
+        _ = new Formula("2e5");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should not throw an exception because there
+    ///     is a valid scientific notated token.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestValidTokenRuleNotatedUpperCase_Valid()
+    {
+        _ = new Formula("3.5E-6");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should not throw an exception because there
+    ///     is a valid scientific notated token.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestValidTokenRuleNotatedLowerCase_Valid()
+    {
+        _ = new Formula("3.5e-6");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should not throw an exception because there
+    ///     is a valid scientific notated token.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestValidTokenRuleVariableSplit_Invalid()
+    {
+        _ = new Formula("abc2b");
+    }
+
     // --- Tests for Closing Parenthesis Rule
 
     /// <summary>
@@ -147,6 +198,17 @@ public class FormulaSyntaxTests
     public void FormulaConstructor_TestClosingParenthesesOneMore_Invalid()
     {
         _ = new Formula("(1+3)*1)");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should throw an exception because there
+    ///     is only one parentheses and you can't start a formula with a closing one.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestClosingParentheses_InvalidBecauseOfOrder()
+    {
+        _ = new Formula(")(");
     }
 
     // --- Tests for Balanced Parentheses Rule
@@ -190,6 +252,28 @@ public class FormulaSyntaxTests
         _ = new Formula(")");
     }
 
+    /// <summary>
+    ///     This is an example of a test that should throw an exception because there
+    ///     the following rules not met even though the balanced rule is.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestBalanced_GoodButFollowingInvalid()
+    {
+        _ = new Formula("()");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should throw an exception because there
+    ///     is only one parentheses. It is not balanced.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestBalanced_Invalid()
+    {
+        _ = new Formula("(5+guy");
+    }
+
     // --- Tests for First Token Rule
 
     /// <summary>
@@ -203,9 +287,9 @@ public class FormulaSyntaxTests
     ///   </remarks>
     /// </summary>
     [TestMethod]
-    public void FormulaConstructor_TestFirstTokenNumber_Valid( )
+    public void FormulaConstructor_TestFirstTokenNumber_Valid()
     {
-        _ = new Formula( "1+1" );
+        _ = new Formula("1+1");
     }
 
     /// <summary>
@@ -229,6 +313,16 @@ public class FormulaSyntaxTests
         _ = new Formula("abc123 + 1");
     }
 
+    /// <summary>
+    ///     This is an example of a test that is should not throw an exception
+    ///     because all requirements are met.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestFirstTokenParentheses_Valid()
+    {
+        _ = new Formula("(23)");
+    }
+
     // --- Tests for  Last Token Rule ---
 
     /// <summary>
@@ -243,10 +337,11 @@ public class FormulaSyntaxTests
     }
 
     /// <summary>
-    ///     This is an example of a test that is expected to pass because
-    ///     the last token is a number and all the other rules are met.
+    ///     This is an example of a test that is expected to throw because
+    ///     the parentheses aren't balanced even though the last token is fine.
     /// </summary>
     [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
     public void FormulaConstructor_TestLastTokenNumber_Valid()
     {
         _ = new Formula("(3/5");
@@ -262,6 +357,16 @@ public class FormulaSyntaxTests
         _ = new Formula("1+a1");
     }
 
+    /// <summary>
+    ///     This is an example of a test that is not expected to throw an
+    ///     exception. Its last token is a number.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestLastTokenNum_Valid()
+    {
+        _ = new Formula("1+2e5");
+    }
+
     // --- Tests for Parentheses/Operator Following Rule ---
 
     /// <summary>
@@ -275,5 +380,70 @@ public class FormulaSyntaxTests
         _ = new Formula("(abc12*a1)");
     }
 
+    /// <summary>
+    ///     This is an example of a test that is not expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestFollowingAfterOperatorNum_Valid()
+    {
+        _ = new Formula("AAab1 - 3");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that is not expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestFollowingAfterOperatorOpening_Valid()
+    {
+        _ = new Formula("45/(2+2)");
+    }
+
     // --- Tests for Extra Following Rule ---
+
+    /// <summary>
+    ///     This is an example of a test that is not expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestExtraFollowingAfterNum_Valid()
+    {
+        _ = new Formula("45/2");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that is not expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestExtraFollowingAfterVariable_Valid()
+    {
+        _ = new Formula("hello35/2");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that is not expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestExtraFollowingAfterClosing_Valid()
+    {
+        _ = new Formula("((junior1+2))");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that is not expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestExtraFollowingAfterWithVariable_Valid()
+    {
+        _ = new Formula("elmo2*elmo9");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that is not expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestExtraFollowingRandomTokens_Invalid()
+    {
+        _ = new Formula("1abc2a-x2");
+    }
+
 }
