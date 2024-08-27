@@ -1,5 +1,5 @@
 // <copyright file="FormulaSyntaxTests.cs" company="UofU-CS3500">
-//   Copyright © 2024 UofU-CS3500. All rights reserved.
+//   Copyright 2024 UofU-CS3500. All rights reserved.
 // </copyright>
 // <authors> Breanna Giang </authors>
 // <date> August 21, 2024 </date>
@@ -115,7 +115,7 @@ public class FormulaSyntaxTests
     }
 
     /// <summary>
-    ///     This is an example of a test that is should throw an exception because there
+    ///     This is an example of a test that should throw an exception because there
     ///     is an invalid token in the formula.
     /// </summary>
     [TestMethod]
@@ -137,13 +137,35 @@ public class FormulaSyntaxTests
     }
 
     /// <summary>
-    ///     This is an example of a test that is should throw an exception because there
-    ///     is an invalid token in the formula.
+    ///     This is an example of a test that should not throw an exception because there
+    ///     is all valid tokens in the formula.
     /// </summary>
     [TestMethod]
     public void FormulaConstructor_TestValidTokenRule_AllValidTokens()
     {
         _ = new Formula("1+2*3/4-5*(23*2)");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should not throw an exception because there
+    ///     is all valid tokens in the formula.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestValidTokenRuleWithWhitespace_ValidTokens()
+    {
+        _ = new Formula("8 * 9");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should throw an exception because there
+    ///     is an invalid tokens in the formula.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+
+    public void FormulaConstructor_TestValidTokenRule_InvalidTokens()
+    {
+        _ = new Formula("$");
     }
 
     /// <summary>
@@ -177,8 +199,8 @@ public class FormulaSyntaxTests
     }
 
     /// <summary>
-    ///     This is an example of a test that should not throw an exception because there
-    ///     is a valid scientific notated token.
+    ///     This is an example of a test that should throw an exception because after
+    ///     the split, there is an invalid variable token i.e. 'b'.
     /// </summary>
     [TestMethod]
     [ExpectedException(typeof(FormulaFormatException))]
@@ -253,7 +275,7 @@ public class FormulaSyntaxTests
     }
 
     /// <summary>
-    ///     This is an example of a test that should throw an exception because there
+    ///     This is an example of a test that should throw an exception because
     ///     the following rules not met even though the balanced rule is.
     /// </summary>
     [TestMethod]
@@ -272,6 +294,16 @@ public class FormulaSyntaxTests
     public void FormulaConstructor_TestBalanced_Invalid()
     {
         _ = new Formula("(5+guy");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that should not throw an exception 
+    ///     because it is balanced.
+    /// </summary>
+    [TestMethod]
+    public void FormulaConstructor_TestNestedLongBalancedParentheses_Valid()
+    {
+        _ = new Formula("((((1+2)+3)+4)+5)");
     }
 
     // --- Tests for First Token Rule
@@ -305,7 +337,7 @@ public class FormulaSyntaxTests
 
     /// <summary>
     ///     This is an example of a test that is expected to pass because
-    ///     the first token is a variable.
+    ///     the first token is a variable. All rules are met.
     /// </summary>
     [TestMethod]
     public void FormulaConstructor_TestFirstTokenIsVariable_Valid()
@@ -398,6 +430,36 @@ public class FormulaSyntaxTests
         _ = new Formula("45/(2+2)");
     }
 
+    /// <summary>
+    ///     This is an example of a test that is expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestFollowingAfterOperatorAfterOperator_Invalid()
+    {
+        _ = new Formula("5**5");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that is expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestFollowingAfterOperatorIsNothing_Invalid()
+    {
+        _ = new Formula("1*");
+    }
+
+    /// <summary>
+    ///     This is an example of a test that is expected to throw an exception.
+    /// </summary>
+    [TestMethod]
+    [ExpectedException(typeof(FormulaFormatException))]
+    public void FormulaConstructor_TestFollowingBeforeOperatorIsNothing_Invalid()
+    {
+        _ = new Formula("*6");
+    }
+
     // --- Tests for Extra Following Rule ---
 
     /// <summary>
@@ -437,7 +499,7 @@ public class FormulaSyntaxTests
     }
 
     /// <summary>
-    ///     This is an example of a test that is not expected to throw an exception.
+    ///     This is an example of a test that is expected to throw an exception.
     /// </summary>
     [TestMethod]
     [ExpectedException(typeof(FormulaFormatException))]
