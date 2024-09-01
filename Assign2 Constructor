@@ -1,0 +1,78 @@
+ public Formula(string formula)
+ {
+     if (string.IsNullOrWhiteSpace(formula))
+     {
+         throw new FormulaFormatException("The formula cannot be empty.");
+     }
+
+     List<string> tokens = GetTokens(formula);
+     if (tokens.Count == 0)
+     {
+         throw new FormulaFormatException("There has to be at least one token in the formula");
+     }
+
+     int numOfOpeningParentheses = 0;
+     int numOfClosingParentheses = 0;
+     string prevToken = " ";
+
+     foreach (string token in tokens)
+     {
+         // balanced parentheses rule
+         if (token == "(")
+         {
+             numOfOpeningParentheses++;
+         }
+         else if (token == ")")
+         {
+             numOfClosingParentheses++;
+             if (numOfClosingParentheses > numOfOpeningParentheses)
+             {
+                 throw new FormulaFormatException("More closing parentheses than opening ones.");
+             }
+         }
+         // valid variable rule
+         if (IsVar(token))
+         {
+             if (prevToken != " " && (char.IsLetter(prevToken[0]) || prevToken == ")"))
+             {
+                 throw new FormulaFormatException("Incorrect variable sequence.");
+             }
+         }
+         else if (token == "(")
+         {
+             // left parenthesis check
+             if (prevToken != " " && (char.IsLetter(prevToken[0]) || char.IsDigit(prevToken[0]) || prevToken == ")"))
+             {
+                 throw new FormulaFormatException("Invalid sequence before '('.");
+             }
+         }
+         else if (token == ")")
+         {
+             // right parenthesis check
+             if (prevToken == " " || "+-*/(".Contains(prevToken))
+             {
+                 throw new FormulaFormatException("Invalid sequence before ')'.");
+             }
+         }
+        else
+         {
+             if (!IsVar(token))
+             {
+                 throw new FormulaFormatException("Invalid token '{token}'. Variables must consist of letters followed by numbers.");
+             }
+         }
+
+         prevToken = token;
+     }
+     // balanced parentheses check again
+     if (numOfOpeningParentheses != numOfClosingParentheses)
+     {
+         throw new FormulaFormatException("Mismatched parentheses.");
+     }
+     // check if the last token is valid
+     if (prevToken == " " || "+-*/(".Contains(prevToken))
+     {
+         throw new FormulaFormatException("The formula cannot end with an operator or an opening parenthesis.");
+     }
+
+ }
